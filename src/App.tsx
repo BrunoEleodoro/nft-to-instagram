@@ -1,11 +1,25 @@
 import * as React from 'react';
+import { chain, configureChains, createClient, WagmiConfig } from 'wagmi';
+import { publicProvider } from 'wagmi/providers/public';
 import './App.css';
+import Navbar from './components/Navbar';
+
+const { provider, webSocketProvider } = configureChains(
+  [chain.mainnet, chain.polygon],
+  [publicProvider()]
+);
+
+const client = createClient({
+  autoConnect: true,
+  provider,
+  webSocketProvider,
+});
 
 function App() {
   return (
-    <div>
-      <button className="btn">Hello daisyUI</button>
-    </div>
+    <WagmiConfig client={client}>
+      <Navbar />
+    </WagmiConfig>
   );
 }
 
