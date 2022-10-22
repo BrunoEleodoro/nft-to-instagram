@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Outlet } from 'react-router-dom';
 import { chain, configureChains, createClient, WagmiConfig } from 'wagmi';
 import { publicProvider } from 'wagmi/providers/public';
 import './App.css';
@@ -19,6 +20,7 @@ function App() {
   return (
     <WagmiConfig client={client}>
       <Navbar />
+      <Outlet />
     </WagmiConfig>
   );
 }
