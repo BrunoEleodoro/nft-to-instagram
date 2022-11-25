@@ -6,10 +6,12 @@ import '@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol';
 import '@openzeppelin/contracts/security/Pausable.sol';
 import '@openzeppelin/contracts/access/AccessControl.sol';
 import '@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol';
+import '@openzeppelin/contracts/token/ERC721/extensions/ERC721Royalty.sol';
+
 import '@openzeppelin/contracts/utils/Counters.sol';
 
 contract NftInstagram is
-    ERC721,
+    ERC721Royalty,
     ERC721URIStorage,
     Pausable,
     AccessControl,
@@ -21,12 +23,15 @@ contract NftInstagram is
     bytes32 public constant MINTER_ROLE = keccak256('MINTER_ROLE');
     Counters.Counter private _tokenIdCounter;
 
+    address public receiver = 0xDd6d37E29294A985E49fF301Acc80877fC24997F;
+
     constructor(string memory tokenName, string memory tokenSymbol)
         ERC721(tokenName, tokenSymbol)
     {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(PAUSER_ROLE, msg.sender);
         _grantRole(MINTER_ROLE, msg.sender);
+        // MINTER CONTRACT
     }
 
     function pause() public onlyRole(PAUSER_ROLE) {
@@ -45,6 +50,8 @@ contract NftInstagram is
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
+        // 1% of the NFT sell goes to me
+        _setTokenRoyalty(tokenId, receiver, 100);
     }
 
     function _beforeTokenTransfer(
@@ -60,7 +67,7 @@ contract NftInstagram is
 
     function _burn(uint256 tokenId)
         internal
-        override(ERC721, ERC721URIStorage)
+        override(ERC721Royalty, ERC721, ERC721URIStorage)
     {
         super._burn(tokenId);
     }
@@ -77,7 +84,7 @@ contract NftInstagram is
     function supportsInterface(bytes4 interfaceId)
         public
         view
-        override(ERC721, AccessControl)
+        override(ERC721Royalty, ERC721, AccessControl)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
